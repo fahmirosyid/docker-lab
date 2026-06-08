@@ -71,7 +71,7 @@ def metrics():
     """Prometheus metrics endpoint."""
     try:
         conn = psycopg2.connect(**DB); cur = conn.cursor()
-        cur.execute("SELECT COUNT(*) FROM logs.container_logs")
+        cur.execute("SELECT COUNT(*) FROM logs.fluentbit")
         LOG_COUNT.set(cur.fetchone()[0])
         cur.execute("SELECT count(*) FROM pg_stat_activity WHERE datname = %s", (DB["dbname"],))
         DB_CONNECTIONS.set(cur.fetchone()[0])
@@ -94,11 +94,14 @@ def health():
 def log_stats():
     try:
         conn = psycopg2.connect(**DB); cur = conn.cursor()
-        cur.execute("""SELECT log_level, COUNT(*) FROM logs.container_logs
-                       WHERE received_at > NOW() - INTERVAL '1 hour'
-                       GROUP BY log_level ORDER BY count DESC""")
+        cur.execute("""SELECT (data->>'log')::jsonb->>'level' AS level, COUNT(*)
+                       FROM logs.fluentbit
+                       WHERE time > NOW() - INTERVAL '1 hour'
+                         AND data->>'log' IS NOT NULL
+                         AND LEFT(TRIM(data->>'log'),1) = '{'
+                       GROUP BY level ORDER BY count DESC""")
         stats = [{"level": r[0], "count": r[1]} for r in cur.fetchall()]
-        cur.execute("SELECT COUNT(*) FROM logs.container_logs")
+        cur.execute("SELECT COUNT(*) FROM logs.fluentbit")
         total = cur.fetchone()[0]; cur.close(); conn.close()
         return jsonify({"total_logs": total, "last_hour": stats})
     except Exception as e:

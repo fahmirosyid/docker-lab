@@ -9,7 +9,7 @@
       "datasource": { "type": "postgres", "uid": "" },
       "fieldConfig": { "defaults": { "thresholds": { "steps": [{ "color": "blue", "value": null }] } }, "overrides": [] },
       "targets": [{
-        "rawSql": "SELECT COUNT(*) AS total FROM logs.container_logs;",
+        "rawSql": "SELECT COUNT(*) AS total FROM logs.fluentbit;",
         "format": "table"
       }]
     },
@@ -20,7 +20,7 @@
       "datasource": { "type": "postgres", "uid": "" },
       "fieldConfig": { "defaults": { "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 10 }] } }, "overrides": [] },
       "targets": [{
-        "rawSql": "SELECT COUNT(*) AS errors FROM logs.container_logs WHERE log_level IN ('ERROR','CRITICAL') AND received_at > NOW() - INTERVAL '1 hour';",
+        "rawSql": "SELECT COUNT(*) AS errors FROM logs.fluentbit WHERE data->>'log' IS NOT NULL AND LEFT(TRIM(data->>'log'),1)='{' AND (data->>'log')::jsonb->>'level' IN ('ERROR','CRITICAL') AND time > NOW() - INTERVAL '1 hour';",
         "format": "table"
       }]
     },
@@ -30,7 +30,7 @@
       "gridPos": { "h": 8, "w": 24, "x": 0, "y": 4 },
       "datasource": { "type": "postgres", "uid": "" },
       "targets": [{
-        "rawSql": "SELECT date_trunc('minute', received_at) AS time, COUNT(*) AS count FROM logs.container_logs WHERE $__timeFilter(received_at) GROUP BY time ORDER BY time;",
+        "rawSql": "SELECT date_trunc('minute', time) AS time, COUNT(*) AS count FROM logs.fluentbit WHERE $__timeFilter(time) GROUP BY 1 ORDER BY 1;",
         "format": "time_series"
       }]
     },
@@ -40,7 +40,7 @@
       "gridPos": { "h": 8, "w": 8, "x": 0, "y": 12 },
       "datasource": { "type": "postgres", "uid": "" },
       "targets": [{
-        "rawSql": "SELECT log_level AS metric, COUNT(*) AS value FROM logs.container_logs WHERE received_at > NOW() - INTERVAL '1 hour' GROUP BY log_level ORDER BY value DESC;",
+        "rawSql": "SELECT (data->>'log')::jsonb->>'level' AS metric, COUNT(*) AS value FROM logs.fluentbit WHERE time > NOW() - INTERVAL '1 hour' AND data->>'log' IS NOT NULL AND LEFT(TRIM(data->>'log'),1)='{' GROUP BY metric ORDER BY value DESC;",
         "format": "table"
       }]
     },
@@ -50,7 +50,7 @@
       "gridPos": { "h": 8, "w": 8, "x": 8, "y": 12 },
       "datasource": { "type": "postgres", "uid": "" },
       "targets": [{
-        "rawSql": "SELECT container_name AS metric, COUNT(*) AS value FROM logs.container_logs WHERE received_at > NOW() - INTERVAL '1 hour' GROUP BY container_name ORDER BY value DESC;",
+        "rawSql": "SELECT tag AS metric, COUNT(*) AS value FROM logs.fluentbit WHERE time > NOW() - INTERVAL '1 hour' GROUP BY tag ORDER BY value DESC;",
         "format": "table"
       }]
     },
@@ -60,7 +60,7 @@
       "gridPos": { "h": 8, "w": 8, "x": 16, "y": 12 },
       "datasource": { "type": "postgres", "uid": "" },
       "targets": [{
-        "rawSql": "SELECT to_char(timestamp, 'HH24:MI:SS') AS time, container_name, log_level, LEFT(message, 120) AS message FROM logs.container_logs WHERE log_level IN ('ERROR','CRITICAL') ORDER BY timestamp DESC LIMIT 20;",
+        "rawSql": "SELECT to_char(time, 'HH24:MI:SS') AS time, REPLACE(data->>'container_name','/','') AS container, (data->>'log')::jsonb->>'level' AS level, LEFT((data->>'log')::jsonb->>'message',120) AS message FROM logs.fluentbit WHERE data->>'log' IS NOT NULL AND LEFT(TRIM(data->>'log'),1)='{' AND (data->>'log')::jsonb->>'level' IN ('ERROR','CRITICAL') ORDER BY time DESC LIMIT 20;",
         "format": "table"
       }]
     }

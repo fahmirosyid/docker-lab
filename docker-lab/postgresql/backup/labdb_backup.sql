@@ -2,10 +2,10 @@
 -- PostgreSQL database dump
 --
 
-\restrict nuy51Sm736gBSrOKfgHPWpF9j4GSnUNcb9Ti14cLCrq4bk8MaPIX9Tyli0aAI4z
+\restrict DRLlCFS9kfVCkMCvHZlg02ke7DRhQcEpdlVbnkij1cUR0CKFCgwpb9dJouSAXue
 
--- Dumped from database version 16.14
--- Dumped by pg_dump version 16.14
+-- Dumped from database version 16.13
+-- Dumped by pg_dump version 16.13
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -226,11 +226,11 @@ COPY app.activity_log (id, "timestamp", level, source, message, metadata) FROM s
 --
 
 COPY app.mahasiswa (id, nrp, nama, kelas, kelompok, email, created_at) FROM stdin;
-1	3122600001	Ahmad Fauzi	A	1	ahmad@student.pens.ac.id	2026-05-17 11:16:18.54979
-2	3122600002	Budi Santoso	A	1	budi@student.pens.ac.id	2026-05-17 11:16:18.54979
-3	3122600003	Citra Dewi	B	2	citra@student.pens.ac.id	2026-05-17 11:16:18.54979
-4	3122600004	Dian Pratama	B	2	dian@student.pens.ac.id	2026-05-17 11:16:18.54979
-5	3122600005	Eka Putra	C	3	eka@student.pens.ac.id	2026-05-17 11:16:18.54979
+1	3122600001	Ahmad Fauzi	A	1	ahmad@student.pens.ac.id	2026-05-10 16:49:40.331798
+2	3122600002	Budi Santoso	A	1	budi@student.pens.ac.id	2026-05-10 16:49:40.331798
+3	3122600003	Citra Dewi	B	2	citra@student.pens.ac.id	2026-05-10 16:49:40.331798
+4	3122600004	Dian Pratama	B	2	dian@student.pens.ac.id	2026-05-10 16:49:40.331798
+5	3122600005	Eka Putra	C	3	eka@student.pens.ac.id	2026-05-10 16:49:40.331798
 \.
 
 
@@ -447,5 +447,5 @@ ALTER DEFAULT PRIVILEGES FOR ROLE labuser IN SCHEMA app GRANT SELECT ON TABLES T
 -- PostgreSQL database dump complete
 --
 
-\unrestrict nuy51Sm736gBSrOKfgHPWpF9j4GSnUNcb9Ti14cLCrq4bk8MaPIX9Tyli0aAI4z
+\unrestrict DRLlCFS9kfVCkMCvHZlg02ke7DRhQcEpdlVbnkij1cUR0CKFCgwpb9dJouSAXue
 

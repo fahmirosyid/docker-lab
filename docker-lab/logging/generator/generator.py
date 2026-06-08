@@ -1,13 +1,13 @@
 """
 Log Generator — mensimulasikan log dari aplikasi production.
-Menghasilkan log JSON ke stdout. Docker fluentd driver menangkap
-dan mengirim ke Fluent Bit → PostgreSQL.
+Menghasilkan log dengan berbagai level: DEBUG, INFO, WARN, ERROR, CRITICAL.
 """
-import json, time, random, socket, datetime, os
+import json, time, random, socket, datetime, sys, os
 
 HOSTNAME = socket.gethostname()
 LOG_INTERVAL = float(os.environ.get("LOG_INTERVAL", "2"))
 
+# Simulasi event dengan bobot probabilitas
 EVENTS = [
     {"level": "INFO",     "weight": 50, "messages": [
         "User login successful",
@@ -80,16 +80,14 @@ def generate_log():
         "request_id": f"req-{random.randint(100000, 999999)}"
     }
 
-    # Output sebagai JSON ke stdout → Docker fluentd driver menangkap
+    # Output sebagai JSON ke stdout → Docker logging driver menangkap
     print(json.dumps(log_entry), flush=True)
 
 if __name__ == "__main__":
     print(json.dumps({
         "timestamp": datetime.datetime.now().isoformat(),
         "level": "INFO",
-        "hostname": HOSTNAME,
-        "service": "log-generator",
-        "message": f"Log generator started, interval={LOG_INTERVAL}s"
+        "message": f"Log generator started on {HOSTNAME}, interval={LOG_INTERVAL}s"
     }), flush=True)
 
     while True:

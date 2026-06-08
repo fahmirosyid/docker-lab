@@ -1,0 +1,22 @@
+                                                                       Table "app.mahasiswa"
+   Column   |            Type             | Collation | Nullable |                  Default                  | Storage  | Compression | Stats target | Description 
+------------+-----------------------------+-----------+----------+-------------------------------------------+----------+-------------+--------------+-------------
+ id         | integer                     |           | not null | nextval('app.mahasiswa_id_seq'::regclass) | plain    |             |              | 
+ nrp        | character varying(15)       |           | not null |                                           | extended |             |              | 
+ nama       | character varying(100)      |           | not null |                                           | extended |             |              | 
+ kelas      | character(1)                |           |          |                                           | extended |             |              | 
+ kelompok   | integer                     |           |          |                                           | plain    |             |              | 
+ email      | character varying(100)      |           |          |                                           | extended |             |              | 
+ created_at | timestamp without time zone |           |          | CURRENT_TIMESTAMP                         | plain    |             |              | 
+Indexes:
+    "mahasiswa_pkey" PRIMARY KEY, btree (id)
+    "idx_mahasiswa_kelas" btree (kelas)
+    "idx_mahasiswa_nrp" btree (nrp)
+    "mahasiswa_nrp_key" UNIQUE CONSTRAINT, btree (nrp)
+Check constraints:
+    "mahasiswa_kelas_check" CHECK (kelas = ANY (ARRAY['A'::bpchar, 'B'::bpchar, 'C'::bpchar, 'D'::bpchar]))
+    "mahasiswa_kelompok_check" CHECK (kelompok >= 1 AND kelompok <= 10)
+Referenced by:
+    TABLE "app.nilai" CONSTRAINT "nilai_mahasiswa_id_fkey" FOREIGN KEY (mahasiswa_id) REFERENCES app.mahasiswa(id) ON DELETE CASCADE
+Access method: heap
+

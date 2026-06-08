@@ -1,20 +1,47 @@
+# ==============================================
+# Prometheus Configuration
+# ==============================================
 global:
-  scrape_interval: 15s
+  scrape_interval: 15s        # Scrape setiap 15 detik
+  evaluation_interval: 15s    # Evaluasi rules setiap 15 detik
+  scrape_timeout: 10s
 
+# ==============================================
+# Alerting Rules
+# ==============================================
+rule_files:
+  - "alert_rules.yml"
+
+# ==============================================
+# Scrape Targets
+# ==============================================
 scrape_configs:
-  - job_name: 'prometheus'
-    static_configs:
-      - targets: ['prometheus:9090']
 
-  - job_name: 'cadvisor'
+  # --- Prometheus self-monitoring ---
+  - job_name: "prometheus"
     static_configs:
-      - targets: ['cadvisor:8080']
+      - targets: ["localhost:9090"]
+        labels:
+          instance: "prometheus-server"
 
-  - job_name: 'node-exporter'
+  # --- Node Exporter (host metrics) ---
+  - job_name: "node-exporter"
     static_configs:
-      - targets: ['node-exporter:9100']
+      - targets: ["node-exporter:9100"]
+        labels:
+          instance: "docker-host"
 
-  - job_name: 'flask-app'
-    metrics_path: /metrics
+  # --- cAdvisor (container metrics) ---
+  - job_name: "cadvisor"
     static_configs:
-      - targets: ['flask-app:5000']
+      - targets: ["cadvisor:8080"]
+        labels:
+          instance: "docker-containers"
+
+  # --- Flask Application ---
+  - job_name: "flask-app"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets: ["flask-app:5000"]
+        labels:
+          instance: "flask-backend"
